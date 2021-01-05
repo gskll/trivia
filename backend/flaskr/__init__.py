@@ -214,6 +214,34 @@ def create_app(test_config=None):
     one question at a time is displayed, the user is allowed to answer
     and shown whether they were correct or not.
     '''
+    @app.route('/quizzes', methods=['POST'])
+    def get_new_quiz_question():
+        body = request.get_json()
+
+        previous_questions = body.get('previous_questions')
+        quiz_category = body.get('quiz_category')
+
+        if previous_questions is None or quiz_category is None:
+            abort(400)
+
+        category = quiz_category['id']
+
+        # If player selects All categories:
+        # passed as quiz_category = {id:0, type:'click'}
+        if category == 0:
+            question_pool = Question.query.filter(
+                Question.id.notin_(previous_questions)).all()
+        else:
+            question_pool = Question.query.filter_by(category=str(category)).filter(
+                Question.id.notin_(previous_questions)).all()
+
+        random_question_index = random.randrange(len(question_pool))
+        random_question_from_pool = question_pool[random_question_index]
+
+        return jsonify({
+            'success': 200,
+            'question': random_question_from_pool.format()
+        })
 
     '''
     Create error handlers for all expected errors
