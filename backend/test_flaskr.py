@@ -35,11 +35,13 @@ class TriviaTestCase(unittest.TestCase):
     """
     def test_get_all_categories(self):
         """Test GET endpoint to retrieve all categories"""
-        res = self.client.get('/categories')
+        res = self.client().get('/categories')
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
-        self.assertTrue(len(data))
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['categories'])
+        self.assertTrue(len(data['categories']))
 
 
 # Make the tests conveniently executable
