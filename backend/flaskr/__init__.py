@@ -8,6 +8,19 @@ from models import setup_db, Question, Category
 
 QUESTIONS_PER_PAGE = 10
 
+"""" UTILS """""
+
+def paginate_questions(request, selection):
+    page = request.args.get('page', 1, type=int)
+    start = (page - 1) * QUESTIONS_PER_PAGE
+    end = start + QUESTIONS_PER_PAGE
+
+    formatted_questions = [question.format() for question in selection]
+    current_questions = formatted_questions[start:end]
+
+    return current_questions
+
+
 
 def create_app(test_config=None):
     # create and configure the app
@@ -59,14 +72,8 @@ def create_app(test_config=None):
     '''
     @ app.route('/questions')
     def get_paginated_questions():
-        page = request.args.get('page', 1, type=int)
-        start = (page - 1) * QUESTIONS_PER_PAGE
-        end = start + QUESTIONS_PER_PAGE
-
         questions = Question.query.order_by(Question.id).all()
-        formatted_questions = [question.format() for question in questions]
-        current_questions = formatted_questions[start:end]
-
+        current_questions = paginate_questions(request, questions) 
         categories = Category.query.all()
 
         if len(current_questions) == 0:
@@ -75,7 +82,7 @@ def create_app(test_config=None):
         return jsonify({
             'success': True,
             'questions': current_questions,
-            'total_questions': len(formatted_questions),
+            'total_questions': len(questions),
             'current_category': None,
             'categories': {category.id: category.type for category in categories},
         })
