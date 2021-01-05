@@ -12,7 +12,7 @@ QUESTIONS_PER_PAGE = 10
 
 
 def paginate_questions(request, selection):
-    page = request.args.get('page', 1, type=int)
+    start = request.args.get('page', 1, type=int)
 
     end = start + QUESTIONS_PER_PAGE
 
