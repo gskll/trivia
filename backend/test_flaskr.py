@@ -45,6 +45,14 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['categories'])
         self.assertTrue(len(data['categories']))
 
+    def test_get_all_categories_error(self):
+        """Test GET endpoint to retrieve all categories"""
+        res = self.client().post('/categories')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 405)
+        self.assertFalse(data['success'])
+
     def test_get_paginated_questions(self):
         """Test GET paginated questions"""
         res = self.client().get('/questions?page=1')
@@ -64,6 +72,7 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 404)
         self.assertFalse(data['success'])
+
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
