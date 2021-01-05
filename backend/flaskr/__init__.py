@@ -235,12 +235,17 @@ def create_app(test_config=None):
             question_pool = Question.query.filter_by(category=str(category)).filter(
                 Question.id.notin_(previous_questions)).all()
 
-        random_question_index = random.randrange(len(question_pool))
-        random_question_from_pool = question_pool[random_question_index]
+        # handle quiz end i.e. no more available questions
+        if not question_pool:
+            next_question = None 
+        else:
+            random_question_index = random.randrange(len(question_pool))
+            random_question_from_pool = question_pool[random_question_index]
+            next_question = random_question_from_pool.format()
 
         return jsonify({
             'success': 200,
-            'question': random_question_from_pool.format()
+            'question': next_question
         })
 
     '''
