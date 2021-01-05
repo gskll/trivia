@@ -45,7 +45,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['categories'])
         self.assertTrue(len(data['categories']))
 
-    def test_get_all_categories_error(self):
+    def test_405_get_all_categories_invalid_method(self):
         """Test GET endpoint to retrieve all categories"""
         res = self.client().post('/categories')
         data = json.loads(res.data)
@@ -65,7 +65,7 @@ class TriviaTestCase(unittest.TestCase):
         # self.assertTrue(data['current_category'])
         self.assertTrue(len(data['categories']))
 
-    def test_get_paginated_questions_error(self):
+    def test_404_get_paginated_questions_invalid_page(self):
         """Test GET paginated questions with page out of range"""
         res = self.client().get('/questions?page=1000')
         data = json.loads(res.data)
@@ -130,7 +130,7 @@ class TriviaTestCase(unittest.TestCase):
         q = Question.query.get(data['created'])
         q.delete()
 
-    def test_422_add_new_question_empty_field(self):
+    def test_400_add_new_question_empty_field(self):
         prev_question_count = len(Question.query.all())
 
         new_question = {
@@ -146,7 +146,7 @@ class TriviaTestCase(unittest.TestCase):
         curr_question_count = len(Question.query.all())
 
         self.assertEqual(curr_question_count, prev_question_count)
-        self.assertEqual(res.status_code, 422)
+        self.assertEqual(res.status_code, 400)
         self.assertFalse(data['success'])
 
     def test_search_questions(self):
@@ -169,12 +169,12 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(len(data_two['questions']))
         self.assertEqual(data_two['total_questions'], 19)
 
-    def test_422_search_no_term_on_request(self):
+    def test_400_search_no_term_on_request(self):
         search = {}
         res = self.client().post('/questions/search', json=search)
         data = json.loads(res.data)
 
-        self.assertEqual(res.status_code, 422)
+        self.assertEqual(res.status_code, 400)
         self.assertFalse(data['success'])
 
     def test_get_questions_from_category(self):

@@ -125,10 +125,10 @@ def create_app(test_config=None):
     def add_new_question():
         body = request.get_json()
 
-        # Ensure all question values have been filled out
+        # Ensure no empty fields
         for field in body.values():
             if not field:
-                abort(422)
+                abort(400)
 
         new_question = body.get('question')
         new_answer = body.get('answer')
@@ -168,7 +168,7 @@ def create_app(test_config=None):
         search_term = body.get('searchTerm')
 
         if search_term is None:
-            abort(422)
+            abort(400)
 
         search_results = Question.query.filter(
             Question.question.ilike(f"%{search_term}%")).all()
@@ -204,7 +204,6 @@ def create_app(test_config=None):
         })
 
     '''
-    @TODO:
     Create a POST endpoint to get questions to play the quiz.
     This endpoint should take category and previous question parameters
     and return a random questions within the given category,
@@ -237,7 +236,7 @@ def create_app(test_config=None):
 
         # handle quiz end i.e. no more available questions
         if not question_pool:
-            next_question = None 
+            next_question = None
         else:
             random_question_index = random.randrange(len(question_pool))
             random_question_from_pool = question_pool[random_question_index]
