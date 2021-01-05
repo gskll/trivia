@@ -109,6 +109,25 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['success'])
 
 
+    def test_422_add_new_question_empty_field(self):
+        prev_question_count = len(Question.query.all())
+        
+        new_question = {
+            'question': '',
+            'answer': 'b',
+            'category': 1,
+            'difficulty': 1
+        }
+
+        res = self.client().post('/questions', json=new_question)
+        data = json.loads(res.data)
+
+        curr_question_count = len(Question.query.all())
+
+        self.assertEqual(curr_question_count, prev_question_count)
+        self.assertEqual(res.status_code, 422)
+        self.assertFalse(data['success'])
+
 
 
 # Make the tests conveniently executable
