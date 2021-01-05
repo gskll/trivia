@@ -13,7 +13,7 @@ QUESTIONS_PER_PAGE = 10
 
 def paginate_questions(request, selection):
     page = request.args.get('page', 1, type=int)
-    start = (page - 1) * QUESTIONS_PER_PAGE
+
     end = start + QUESTIONS_PER_PAGE
 
     formatted_questions = [question.format() for question in selection]
@@ -142,28 +142,28 @@ def create_app(test_config=None):
     Create error handlers for all expected errors
     including 404 and 422.
     '''
-    @app.errorhandler
+    @app.errorhandler(404)
     def not_found(error):
         return jsonify({
-            "success": False,
-            "error": 404,
-            "message": "resource not found"
+            'success': False,
+            'error': 404,
+            'message': 'resource not found'
         }), 404
 
     @app.errorhandler(422)
     def unprocessable(error):
         return jsonify({
-            "success": False,
-            "error": 422,
-            "message": "unprocessable"
+            'success': False,
+            'error': 422,
+            'message': 'unprocessable'
         }), 422
 
     @app.errorhandler(400)
     def bad_request(error):
         return jsonify({
-            "success": False,
-            "error": 400,
-            "message": "bad request"
+            'success': False,
+            'error': 400,
+            'message': 'bad request'
         }), 400
 
     @app.errorhandler(405)
