@@ -197,8 +197,47 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 404)
         self.assertFalse(data['success'])
-        
 
+    def test_quiz_questions_no_previous_questions(self):
+        prev_questions = []
+        quiz_category = {"id": 1, "type": "Science"}
+
+        quiz_params = {"previous_questions": prev_questions,
+                       "quiz_category": quiz_category}
+
+        res = self.client().post('/quizzes', json=quiz_params)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(data['success'])
+        self.assertTrue(data['question'])
+        self.assertTrue(data['question'] not in prev_questions)
+
+    def test_quiz_questions_with_previous_questions(self):
+        prev_questions = [20, 21]
+        quiz_category = {"id": 1, "type": "Science"}
+
+        quiz_params = {"previous_questions": prev_questions,
+                       "quiz_category": quiz_category}
+
+        res = self.client().post('/quizzes', json=quiz_params)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(data['success'])
+        self.assertEqual(data['question']['id'], 22)
+        self.assertTrue(data['question'] not in prev_questions)
+
+    def test_400_quiz_questions_missing_body_field(self):
+        prev_questions = [20, 21]
+
+        quiz_params = {"previous_questions": prev_questions}
+
+        res = self.client().post('/quizzes', json=quiz_params)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 400)
+        self.assertFalse(data['success'])
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
