@@ -75,11 +75,29 @@ class TriviaTestCase(unittest.TestCase):
 
     def test_delete_question(self):
         """Test DELETE single question"""
-        res = self.client().delete('/questions/5')
+
+        # Insert question to test delete
+        prev_question_count = len(Question.query.all())
+
+        test_question = Question(
+            question='a', answer='b', category=1, difficulty=1)
+        test_question.insert()
+
+        temp_question_count = len(Question.query.all())
+
+        test_question_id = test_question.id
+
+        res = self.client().delete(f'/questions/{test_question_id}')
+
+        final_question_count = len(Question.query.all())
+
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(data['deleted'], 5)
+        self.assertEqual(data['deleted'], test_question_id)
+        self.assertEqual(prev_question_count, final_question_count)
+        self.assertEqual(temp_question_count - prev_question_count, 1)
+        self.assertFalse(Question.query.get(test_question_id))
 
     def test_404_delete_question_invalid_id(self):
         """Test DELETE returns 404 if invalid question id passed"""
@@ -91,15 +109,15 @@ class TriviaTestCase(unittest.TestCase):
 
     def test_add_new_question(self):
         prev_question_count = len(Question.query.all())
-        
-        new_question = {
+
+        test_question = {
             'question': 'a',
             'answer': 'b',
             'category': 1,
             'difficulty': 1
         }
 
-        res = self.client().post('/questions', json=new_question)
+        res = self.client().post('/questions', json=test_question)
         data = json.loads(res.data)
 
         curr_question_count = len(Question.query.all())
@@ -108,10 +126,13 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertTrue(data['success'])
 
+        # Delete test_question from database for subsequent testing
+        q = Question.query.get(data['created'])
+        q.delete()
 
     def test_422_add_new_question_empty_field(self):
         prev_question_count = len(Question.query.all())
-        
+
         new_question = {
             'question': '',
             'answer': 'b',
