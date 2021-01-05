@@ -123,30 +123,35 @@ def create_app(test_config=None):
     '''
     @app.route('/questions', methods=['POST'])
     def add_new_question():
+        body = request.get_json()
+
+        # Ensure all question values have been filled out
+        for field in body.values():
+            if not field:
+                abort(422)
+
+        new_question = body.get('question')
+        new_answer = body.get('answer')
+        new_category = body.get('category')
+        new_difficulty = body.get('difficulty')
+
+        question = Question(
+            question=new_question,
+            answer=new_answer,
+            category=new_category,
+            difficulty=new_difficulty
+        )
+
         try:
-            body = request.get_json()
-
-            new_question = body.get('question', None)
-            new_answer = body.get('answer', None)
-            new_category = body.get('category', None)
-            new_difficulty = body.get('difficulty', None)
-
-            question = Question(
-                question=new_question,
-                answer=new_answer,
-                category=new_category,
-                difficulty=new_difficulty
-            )
-
             question.insert()
-
+        except Exception as e:
+            print('Exception >>>', e)
+            abort(422)
+        else:
             return jsonify({
                 'success': True,
                 'created': question.id
             })
-
-        except:
-            abort(422)
 
     '''
     @TODO:
