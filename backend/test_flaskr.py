@@ -81,6 +81,14 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['deleted'], 5)
 
+    def test_404_delete_question_invalid_id(self):
+        """Test DELETE returns 404 if invalid question id passed"""
+        res = self.client().delete('/questions/1000')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertFalse(data['success'])
+
     def test_add_new_question(self):
         prev_question_count = len(Question.query.all())
         
